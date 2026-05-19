@@ -1,0 +1,99 @@
+Problem Statement — Mini Logger Framework
+
+Build a small logging framework similar to what backend systems use internally.
+
+Requirements
+1. Support multiple log levels
+
+The system should support:
+
+DEBUG
+INFO
+WARN
+ERROR
+2. Support multiple output destinations
+
+Logs can be written to:
+
+Console
+File
+Database (mock/in-memory simulation is enough)
+
+Example:
+
+ERROR → Console + File
+INFO → Console only
+3. Configurable log filtering
+
+The logger should ignore logs below configured severity.
+
+Example:
+
+Configured level = WARN
+DEBUG and INFO should not be logged
+4. Log format should include
+
+Each log entry must contain:
+
+timestamp
+log level
+message
+
+Example:
+
+[2026-05-18 10:15:22] [ERROR] Payment failed
+5. System should allow adding new output destinations easily
+
+Future examples:
+
+Kafka
+ElasticSearch
+Remote server
+
+without major modification to existing flow.
+
+Constraints
+No frameworks
+In-memory/mock implementations only
+Runnable from main
+Focus on clean OOP and extensibility
+Avoid unnecessary abstractions
+Important
+
+Do NOT overengineer this.
+
+A common beginner mistake:
+
+creating 25 interfaces
+making factories for everything
+abstracting prematurely
+
+Aim for:
+
+minimal but extensible
+readable architecture
+low coupling
+Submission
+
+Same as before:
+
+source code
+explanation
+assumptions
+sample execution
+design tradeoffs you considered
+
+This problem is intentionally designed to expose:
+
+misuse of inheritance
+bad switch-case designs
+weak extensibility
+incorrect ownership of responsibilities
+overuse of Singleton
+
+Especially be careful with:
+
+who owns configuration
+who decides routing
+who performs formatting
+who owns destination management
