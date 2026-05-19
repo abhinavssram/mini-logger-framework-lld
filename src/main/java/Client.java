@@ -14,7 +14,7 @@ public class Client {
         logDestinationMapper.setLogTypesDestination(LogTypes.WARN, List.of(new ConsoleOutput(),new FileOutput()));
         logDestinationMapper.setLogTypesDestination(LogTypes.ERROR, List.of(new ConsoleOutput(),new FileOutput(),new DatabaseOutput()));
 
-        Logger logger = new Logger(LogTypes.DEBUG,logDestinationMapper,new LogTypePriority());
+        Logger logger = new Logger(LogTypes.DEBUG,logDestinationMapper);
 
         logger.log(LogTypes.DEBUG,"Value of tensor is : 2");
         logger.log(LogTypes.INFO,"Called PaymentService");
