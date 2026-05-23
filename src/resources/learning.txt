@@ -1,0 +1,66 @@
+Learning Notes — Logger Framework
+
+1. Simpler is better: replaced LogTypePriority class (HashMap + HashSet
+   computation) with a simple int level field on the enum. One less class,
+   one less dependency.
+
+2. Formatting should live in one place: initially each destination built
+   its own formatted string. Extracted to LogFormatter — now adding a
+   Kafka/ES destination doesn't mean copy-pasting the format logic.
+
+3. Filter early: checking logTypes.getLevel() < minLevel before creating
+   LogMessage and looking up destinations avoids unnecessary work.
+
+4. Own your responsibilities clearly:
+   - Logger: orchestration (filter, format, route)
+   - LogDestinationMapper: routing config per log type
+   - LogFormatter: presentation
+   - Destinations: output only
+   - LogMessage: data only
+
+5. Avoid premature abstraction: didn't make LogFormatter an interface or
+   build a factory. The current design is extensible enough — if a custom
+   formatter is needed later, it's easy to inject one.
+
+Design Decisions
+
+- Enum with level field over external priority map: keeps priority
+  co-located with the type, eliminates a class, and makes filtering
+  a single int comparison instead of a HashSet lookup.
+
+- LogDestination.flush(String) over flush(LogMessage): destinations
+  receive a fully formatted string so they never need to know about
+  LogMessage internals. Keeps them thin and the format contract in
+  one place.
+
+- LogFormatter as a concrete class (not interface): satisfies current
+  needs. If custom formatting is required, Logger can accept a
+  LogFormatter parameter — no interface needed upfront.
+
+- Logger owns the full pipeline: filter → format → route. No class
+  bleeds into another's responsibility.
+
+- Destinations are stateless and stateless: they output what they're
+  given. No formatting logic leaks in.
+
+- No dependency injection / no framework: kept to plain constructor
+  wiring. Explicit and readable.
+
+Tradeoffs Considered
+
+- Using enum ordinal instead of explicit level: ordinals are fragile
+  (reordering breaks logic). Explicit int levels are self-documenting
+  and safe.
+
+- LogFormatter as interface: would allow swapping formatters without
+  touching Logger, but adds abstraction before it's needed. Concrete
+  class chosen per "avoid unnecessary abstractions."
+
+- Passing LogMessage vs String to destinations: String keeps
+  destinations ignorant of LogMessage, but if a destination needs
+  structured data (e.g., JSON logger needs level + message separately),
+  flush(LogMessage) would be better. Current choice favors simplicity.
+
+- Single Logger instance vs per-class loggers: single instance works
+  for this scope. Per-class loggers add context (class name) but
+  aren't required here.
